@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?fileVersion 4.0.0?><cproject storage_type_id="org.eclipse.cdt.core.XmlProjectDescriptionStorage">
+	<storageModule moduleId="org.eclipse.cdt.core.settings">
+		<cconfiguration id="org.eclipse.ptp.rdt.managedbuild.config.gnu.exe.debug.159334915">
+			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="org.eclipse.ptp.rdt.managedbuild.config.gnu.exe.debug.159334915" moduleId="org.eclipse.cdt.core.settings" name="Debug">
+				<externalSettings/>
+				<extensions>
+					<extension id="org.eclipse.cdt.core.GmakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.CWDLocator" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GASErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GLDErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.VCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.MakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+				</extensions>
+			</storageModule>
+			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
+				<configuration artifactName="${ProjName}" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.exe" buildProperties="org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.debug,org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.exe" cleanCommand="rm -rf" description="" id="org.eclipse.ptp.rdt.managedbuild.config.gnu.exe.debug.159334915" name="Debug" parent="org.eclipse.ptp.rdt.managedbuild.config.gnu.exe.debug.159334915">
+					<folderInfo id="org.eclipse.ptp.rdt.managedbuild.config.gnu.exe.debug.159334915." name="/" resourcePath="">
+						<toolChain id="org.eclipse.ptp.rdt.managedbuild.toolchain.gnu.exe.debug.317820671" name="Remote Linux GCC Tool Chain">
+							<targetPlatform id="org.eclipse.ptp.rdt.managedbuild.target.gnu.platform.exe.debug.767817173" name="Debug Platform"/>
+							<builder buildPath="${workspace_loc:/addypin}/Debug" enableCleanBuild="false" enabledIncrementalBuild="false" id="org.eclipse.ptp.rdt.managedbuild.target.gnu.builder.exe.debug.1929487573" keepEnvironmentInBuildfile="false" managedBuildOn="false" name="Remote Gnu Make Builder.Debug"/>
+						</toolChain>
+					</folderInfo>
+					<sourceEntries>
+						<entry excluding="include|.settings" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="include"/>
+					</sourceEntries>
+				</configuration>
+			</storageModule>
+			<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
+		</cconfiguration>
+		<cconfiguration id="org.eclipse.ptp.rdt.managedbuild.config.gnu.exe.release.2125197365">
+			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="org.eclipse.ptp.rdt.managedbuild.config.gnu.exe.release.2125197365" moduleId="org.eclipse.cdt.core.settings" name="Release">
+				<externalSettings/>
+				<extensions>
+					<extension id="org.eclipse.cdt.core.GmakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.CWDLocator" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GASErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GLDErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.VCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.MakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+				</extensions>
+			</storageModule>
+			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
+				<configuration artifactName="${ProjName}" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.exe" buildProperties="org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.release,org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.exe" cleanCommand="rm -rf" description="" id="org.eclipse.ptp.rdt.managedbuild.config.gnu.exe.release.2125197365" name="Release" parent="org.eclipse.ptp.rdt.managedbuild.config.gnu.exe.release.2125197365">
+					<folderInfo id="org.eclipse.ptp.rdt.managedbuild.config.gnu.exe.release.2125197365." name="/" resourcePath="">
+						<toolChain id="org.eclipse.ptp.rdt.managedbuild.toolchain.gnu.exe.release.1846859914" name="Remote Linux GCC Tool Chain">
+							<targetPlatform id="org.eclipse.ptp.rdt.managedbuild.target.gnu.platform.exe.release.1397193372" name="Debug Platform"/>
+							<builder buildPath="${workspace_loc:/addypin}/Release" id="org.eclipse.ptp.rdt.managedbuild.target.gnu.builder.exe.release.1730432426" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="Remote Gnu Make Builder.Release"/>
+						</toolChain>
+					</folderInfo>
+				</configuration>
+			</storageModule>
+			<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
+		</cconfiguration>
+	</storageModule>
+	<storageModule moduleId="cdtBuildSystem" version="4.0.0">
+		<project id="addypin.cdt.managedbuild.target.gnu.exe.1405094426" name="Executable" projectType="cdt.managedbuild.target.gnu.exe"/>
+	</storageModule>
+	<storageModule moduleId="scannerConfiguration">
+		<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		<scannerConfigBuildInfo instanceId="org.eclipse.ptp.rdt.managedbuild.config.gnu.exe.release.2125197365;org.eclipse.ptp.rdt.managedbuild.config.gnu.exe.release.2125197365.">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="org.eclipse.ptp.rdt.managedbuilder.gnu.ui.RemoteGCCPerFileProfileCpp"/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="org.eclipse.ptp.rdt.managedbuild.config.gnu.exe.debug.159334915;org.eclipse.ptp.rdt.managedbuild.config.gnu.exe.debug.159334915.;org.eclipse.ptp.rdt.managedbuild.tool.gnu.cpp.compiler.exe.debug.149849410;org.eclipse.ptp.rdt.managedbuild.tool.gnu.cpp.compiler.input.1846322274">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="org.eclipse.ptp.rdt.managedbuilder.gnu.ui.RemoteGCCPerFileProfileCpp"/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.exe.debug.1274178828;cdt.managedbuild.config.gnu.exe.debug.1274178828.;cdt.managedbuild.tool.gnu.c.compiler.exe.debug.1779856527;cdt.managedbuild.tool.gnu.c.compiler.input.748922086">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.exe.release.1918906575;cdt.managedbuild.config.gnu.exe.release.1918906575.;cdt.managedbuild.tool.gnu.cpp.compiler.exe.release.666723043;cdt.managedbuild.tool.gnu.cpp.compiler.input.924427108">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="org.eclipse.ptp.rdt.managedbuild.config.gnu.exe.release.2125197365;org.eclipse.ptp.rdt.managedbuild.config.gnu.exe.release.2125197365.;org.eclipse.ptp.rdt.managedbuild.tool.gnu.c.compiler.exe.release.1656600254;org.eclipse.ptp.rdt.managedbuild.tool.gnu.c.compiler.input.1290976120">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="org.eclipse.ptp.rdt.managedbuilder.gnu.ui.RemoteGCCPerFileProfile"/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.exe.debug.1274178828;cdt.managedbuild.config.gnu.exe.debug.1274178828.;cdt.managedbuild.tool.gnu.cpp.compiler.exe.debug.1826736709;cdt.managedbuild.tool.gnu.cpp.compiler.input.521583736">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="org.eclipse.ptp.rdt.managedbuild.config.gnu.exe.release.2125197365;org.eclipse.ptp.rdt.managedbuild.config.gnu.exe.release.2125197365.;org.eclipse.ptp.rdt.managedbuild.tool.gnu.cpp.compiler.exe.release.425757003;org.eclipse.ptp.rdt.managedbuild.tool.gnu.cpp.compiler.input.1695829638">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="org.eclipse.ptp.rdt.managedbuilder.gnu.ui.RemoteGCCPerFileProfileCpp"/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="org.eclipse.ptp.rdt.managedbuild.config.gnu.exe.debug.159334915;org.eclipse.ptp.rdt.managedbuild.config.gnu.exe.debug.159334915.;org.eclipse.ptp.rdt.managedbuild.tool.gnu.c.compiler.exe.debug.123074890;org.eclipse.ptp.rdt.managedbuild.tool.gnu.c.compiler.input.688437270">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="org.eclipse.ptp.rdt.managedbuilder.gnu.ui.RemoteGCCPerFileProfile"/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="org.eclipse.ptp.rdt.managedbuild.config.gnu.exe.debug.159334915;org.eclipse.ptp.rdt.managedbuild.config.gnu.exe.debug.159334915.">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="org.eclipse.ptp.rdt.managedbuilder.gnu.ui.RemoteGCCPerFileProfileCpp"/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.exe.release.1918906575;cdt.managedbuild.config.gnu.exe.release.1918906575.;cdt.managedbuild.tool.gnu.c.compiler.exe.release.1507022545;cdt.managedbuild.tool.gnu.c.compiler.input.2112598800">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
+	</storageModule>
+	<storageModule moduleId="org.eclipse.cdt.core.LanguageSettingsProviders"/>
+	<storageModule moduleId="refreshScope" versionNumber="2">
+		<configuration configurationName="Release">
+			<resource resourceType="PROJECT" workspacePath="/addypin"/>
+		</configuration>
+		<configuration configurationName="Debug">
+			<resource resourceType="PROJECT" workspacePath="/addypin"/>
+		</configuration>
+	</storageModule>
+	<storageModule moduleId="org.eclipse.cdt.internal.ui.text.commentOwnerProjectMappings"/>
+</cproject>
