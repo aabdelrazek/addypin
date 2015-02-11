@@ -1,26 +1,34 @@
-.CSS-example table {
+.AddyPinMain table {
   width: 0%;
   margin-top: 20px;
   margin-bottom: 20px;
 }
 
-.CSS-example .table-bordered {
-  border: 1px solid #DDD;
-  border-left: 0;
+.AddyPinMain .table-bordered {
+  border: 3px solid #DDD;
+  border-left: 4px;
   border-radius: 4px;
 }
 
-.CSS-example .table-condensed th,
-.CSS-example .table-condensed td {
+.AddyPinMain .table-condensed th,
+.AddyPinMain .table-condensed td {
   padding: 4px 5px;
 }
 
-.CSS-example .code {
+.AddyPinMain .label {
   font-family: andale mono;
   color: #570;
   font-size: 97%;
 }
 
-.CSS-example .info {
-  background-color: #D9EDF7;
+.AddyPinMain .info {
+  background-color: #FFFFFF;
+}
+
+.AddyPinMain .col1 {
+  background-color: #EEEEEE;
+}
+
+.AddyPinMain .col2 {
+  background-color: #EEEEEE;
 }

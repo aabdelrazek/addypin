@@ -16,7 +16,7 @@ AddyPinAllocator::AddyPinAllocator() {
 AddyPinAllocator::~AddyPinAllocator() {
 }
 
-void AddyPinAllocator::AllocatePin(AddyPin& rNewPin) {
+std::string AddyPinAllocator::AllocatePin() {
 	std::string str = "000000";
 	int minNumAsccii = 48; // '0'
 	int minCharAsccii = 97; // 'a'
@@ -28,7 +28,7 @@ void AddyPinAllocator::AllocatePin(AddyPin& rNewPin) {
 	str[4] = rand() % 10 + minNumAsccii;
 	str[5] = rand() % 10 + minNumAsccii;
 
-	rNewPin.SetPin(str);
+	return str;
 }
 
 

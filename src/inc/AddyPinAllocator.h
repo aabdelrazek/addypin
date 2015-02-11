@@ -9,8 +9,6 @@
 #define ADDYPINALLOCATOR_H_
 
 #include <string>
-#include "AddyUserInfo.h"
-#include "AddyPin.h"
 
 //! this class takes care of creating new pin for a new user using some random generators
 class AddyPinAllocator {
@@ -18,7 +16,7 @@ public:
 	AddyPinAllocator();
 	virtual ~AddyPinAllocator();
 
-	void AllocatePin(AddyPin& rNewPin);
+	std::string AllocatePin();
 	bool ValidatePin(std::string val);
 private:
 	bool ValidNumeric(char& c);

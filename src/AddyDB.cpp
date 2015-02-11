@@ -9,10 +9,9 @@
 #include <string>
 #include <stdio.h>
 #include "utils/inc/CException.hpp"
+#include <Wt/WApplication>
 
-#include <stdio.h>
-
-const std::string AddyDB::kDbPath = "/home/aabdelrazek/addypin/addypin/";
+const std::string AddyDB::kDbPath = "./";
 const std::string AddyDB::kDbFile = "addypin_data.hdf";
 
 AddyDB::AddyDB() :
@@ -22,7 +21,7 @@ AddyDB::AddyDB() :
 	try {
 		LoadMap();
 	} catch (CException& e) {
-		printf("no data to load!!!!!\n");
+		Wt::log("error")<<"no data to load!!!!!";
 	}
 }
 
@@ -30,39 +29,31 @@ AddyDB::~AddyDB() {
 	try {
 		SaveMap();
 	}catch (CException& e) {
-		printf("Failed to save!!!!!\n");
+		Wt::log("error")<<"Failed to save!!!!!";
 	}
 }
 
-AddyPin AddyDB::Add(AddyUserInfo& user) {
+std::string AddyDB::Add(AddyUserInfo& user) {
 
-	AddyPin addyPin;
-	mAddyPinAllocator.AllocatePin(addyPin);
-
-	std::pair<std::map<std::string, AddyPin>::iterator, bool> ret;
-	ret = mPinMap.insert(std::pair<std::string, AddyPin>(addyPin.GetPin(), addyPin));
+	std::string pin = mAddyPinAllocator.AllocatePin();
+	std::pair<std::map<std::string, AddyUserInfo&>::iterator, bool> ret;
+	ret = mUserInfoMap.insert(std::pair<std::string, AddyUserInfo&>(pin, user));
 
 	if (ret.second == false) {
 		// pin already used
-		printf("pin already used in the hash maps\n");
+		Wt::log("error")<< "pin already used in the hash maps";
 		DumpPinMap();
 		return Add(user);
 	} else {
-		std::pair<std::map<std::string, AddyUserInfo&>::iterator, bool> ret2;
-		ret2 = mUserInfoMap.insert(std::pair<std::string, AddyUserInfo&>(addyPin.GetPin(), user));
-		if (ret2.second == false) {
-			printf("insertion FAILED, should never occur!!\n");
-			return addyPin;
-		}
 		SaveMap();
-		return addyPin;
+		return pin;
 	}
 }
 
 bool AddyDB::SaveMap() {
 
 	if (!mHdfManager.IsCreated()) {
-		printf("SaveMap: file not created, create it now\n");
+		Wt::log("debug")<<"SaveMap: file not created, create it now";
 		mHdfManager.Create();
 	}
 
@@ -79,7 +70,6 @@ bool AddyDB::SaveMap() {
 bool AddyDB::LoadMap() {
 	if (mHdfManager.IsFilePresent()) {
 		if (!mHdfManager.IsCreated()) {
-			printf("LoadMap: file not created, create it now\n");
 			mHdfManager.Create();
 		}
 		mHdfManager.ImportData();
@@ -90,7 +80,7 @@ bool AddyDB::LoadMap() {
 			std::string pin = pUi->Deserialize(entry);
 			std::pair<std::map<std::string, AddyUserInfo&>::iterator, bool> ret = mUserInfoMap.insert(std::pair<std::string, AddyUserInfo&>(pin, *pUi));
 			if (ret.second == false) {
-				printf("LoadMap: insertion FAILED, should never occur!!\n");
+				Wt::log("error")<<"LoadMap: insertion FAILED, should never occur!!";
 				return false;
 			}
 		}
@@ -99,11 +89,11 @@ bool AddyDB::LoadMap() {
 }
 
 void AddyDB::DumpPinMap() {
-	printf("==================\n");
-	for (std::map<std::string, AddyPin>::iterator it = mPinMap.begin(); it != mPinMap.end(); it++) {
-		printf("pin map entry with key @ %p = %s and data @ %p\n", &(it->first), it->first.c_str(), &(it->second));
+	Wt::log("debug")<<"=======================";
+	for (std::map<std::string, AddyUserInfo&>::iterator it = mUserInfoMap.begin(); it != mUserInfoMap.end(); it++) {
+		Wt::log("debug")<<"pin map entry with key @ "<< &(it->first) <<"= " << it->first.c_str() << "and data @ " << &(it->second);
 	}
-	printf("==================\n");
+	Wt::log("debug")<<"=======================";
 }
 
 AddyDB::ELookupResult AddyDB::FindByPin(std::string pin, AddyUserInfo& rRet) {

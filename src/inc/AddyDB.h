@@ -29,7 +29,7 @@ public:
 	AddyDB();
 	virtual ~AddyDB();
 
-	AddyPin Add(AddyUserInfo& user);
+	std::string Add(AddyUserInfo& user);
 	ELookupResult FindByPin(std::string pin, AddyUserInfo& rRet);
 	AddyUserInfo& CreateUserInfo(std::string addr, std::string name);
 	void DumpPinMap();
@@ -39,7 +39,6 @@ private:
 	CHdfFileAdapter mHdfFileAdapter;					//!< file on disk
 	CHdfManager mHdfManager;							//!< HDF formated file manager
 	std::map<std::string, AddyUserInfo&> mUserInfoMap;	//!< map of pins to user info
-	std::map<std::string, AddyPin> mPinMap;				//!< map of all available pins so far
 	AddyPinAllocator mAddyPinAllocator;					//!< the only allocator for entries in the DB
 	static const std::string kDbPath;
 	static const std::string kDbFile;

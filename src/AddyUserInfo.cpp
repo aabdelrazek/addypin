@@ -27,7 +27,6 @@ std::string& AddyUserInfo::GetUserName() {
 std::string AddyUserInfo::Deserialize(std::string& rEntry) {
 	std::deque<std::string> strList;
 	strtk::parse(rEntry,"||",strList);
-	printf("\n=========== %d %s %s %s =============\n", strList.size(), strList[0].c_str(), strList[1].c_str(), strList[2].c_str());
 	if (strList.size() == 3) {
 		mAddress = strList[0];
 		mUserName = strList[1];
