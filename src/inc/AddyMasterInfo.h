@@ -1,7 +1,7 @@
 /*
- * AddyUserInfo.h
+ * AddyMasterInfo.h
  *
- *  Created on: 2015-02-01
+ *  Created on: 2015-02-14
  *      Author: aabdelrazek
  */
 
