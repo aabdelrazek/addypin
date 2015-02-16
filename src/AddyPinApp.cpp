@@ -6,6 +6,7 @@
  */
 
 #include "inc/AddyPinApp.h"
+#include "inc/AddyAccountMngmnt.h"
 #include <Wt/WTemplate>
 #include <Wt/Mail/Client>
 #include <Wt/Mail/Message>
@@ -14,21 +15,24 @@
 #include <Wt/WIconPair>
 #include <Wt/WImage>
 #include <Wt/WFileResource>
+
 /*
  * The env argument contains information about the new session, and
  * the initial request. It must be passed to the WApplication
  * constructor so it is typically also an argument for your custom
  * application constructor.
 */
-AddyPinApp::AddyPinApp(const WEnvironment& env, AddyDB& rDB, AppStartupView view, AddyDB::ELookupResult res, AddyUserInfo* user):
+AddyPinApp::AddyPinApp(const WEnvironment& env, AddyDB& rDB, AppStartupView view, std::string pinToLookup):
 		WApplication(env),
 		mStartupView(view),
 		mrDB(rDB),
 		mpInputAddress(NULL),
-		mpNameEdit(NULL),
-		mpResult(NULL),
+		mpInputEmail1(NULL),
 		mpSubmitButton(NULL),
+		mpInputPin(NULL),
 		mpLookupButton(NULL),
+		mpAccountMngmnt(NULL),
+		mpResult(NULL),
 		mResultPanel(NULL) {
 
 	setTitle("AddyPin!!");
@@ -36,23 +40,29 @@ AddyPinApp::AddyPinApp(const WEnvironment& env, AddyDB& rDB, AppStartupView view
     setTheme(new WBootstrapTheme());
 
     switch(mStartupView) {
+
     case kMainview:
     	BuildMainView();
     	break;
 
+    case kAccountManagementView:
+    	break;
+
     case kLookupView:
+		AddyUserInfo* pRet = NULL;
+		AddyDB::EOperationResult res = mrDB.FindByPin(pinToLookup, pRet);
     	Wt::WContainerWidget *pTopContainer = new Wt::WContainerWidget(root());
     	pTopContainer->setStyleClass("AddyPinMain");
     	mResultPanel = new Wt::WPanel(root());
     	mResultPanel->setTitle("Address Lookup Result!");
     	mResultPanel->setCentralWidget(pTopContainer);
     	mpResult = new WText(pTopContainer);
-    	BuildLookupView(res, user);
+    	BuildLookupView(res, pRet);
     	break;
     }
 }
 
-void AddyPinApp::BuildLookupView(AddyDB::ELookupResult res, AddyUserInfo* user) {
+void AddyPinApp::BuildLookupView(AddyDB::EOperationResult res, AddyUserInfo* user) {
 	std::string retStr;
 	switch(res) {
 	case AddyDB::kSuccess:
@@ -65,6 +75,9 @@ void AddyPinApp::BuildLookupView(AddyDB::ELookupResult res, AddyUserInfo* user) 
 
 	case AddyDB::kNotFound:
 		retStr = std::string("can't find an address entry with the given PIN!");
+		break;
+
+	default:
 		break;
 	}
 
@@ -88,20 +101,22 @@ void AddyPinApp::BuildMainView() {
     pTopContainer->addWidget(new WBreak());
     pTopContainer->addWidget(new WBreak());
 
+    Wt::WAnimation animation(Wt::WAnimation::SlideInFromTop, Wt::WAnimation::EaseOut, 100);
+
     Wt::WPanel *panel1 = new Wt::WPanel(pTopContainer);
     panel1->setTitle("Register New Address!");
-    //panel1->addStyleClass("AddyPinMain");
     panel1->setCollapsible(true);
-    //panel1->collapseIcon()->()
+    panel1->setAnimation(animation);
 
     Wt::WPanel *panel2 = new Wt::WPanel(pTopContainer);
 	panel2->setTitle("Lookup an address!");
-	//panel2->addStyleClass("centered-example");
 	panel2->setCollapsible(true);
-
-    Wt::WAnimation animation(Wt::WAnimation::SlideInFromTop, Wt::WAnimation::EaseOut, 100);
-    panel1->setAnimation(animation);
     panel2->setAnimation(animation);
+
+    Wt::WPanel *panel3 = new Wt::WPanel(pTopContainer);
+	panel3->setTitle("Manage your addresses!");
+	panel3->setCollapsible(true);
+    panel3->setAnimation(animation);
 
     // new input widget
     Wt::WContainerWidget* pNewInputContainer = new Wt::WContainerWidget(pTopContainer);
@@ -119,12 +134,12 @@ void AddyPinApp::BuildMainView() {
 	pTable->elementAt(0, 1)->setStyleClass("info");
 	pTable->elementAt(1, 0)->addWidget(new WText("email:"));
 	pTable->elementAt(1, 0)->setStyleClass("label");
-	mpNameEdit = new WLineEdit(pNewInputContainer);
-	mpNameEdit->setMinimumSize(350, 20);
-	pTable->elementAt(1, 1)->addWidget(mpNameEdit);
+	mpInputEmail1 = new WLineEdit(pNewInputContainer);
+	mpInputEmail1->setMinimumSize(350, 20);
+	pTable->elementAt(1, 1)->addWidget(mpInputEmail1);
 	pTable->elementAt(1, 1)->setStyleClass("info");
 	mpSubmitButton = new WPushButton("Submit!", pNewInputContainer);
-	////////////////////////////////////////////////////////////////
+	mpSubmitButton->clicked().connect(this, &AddyPinApp::SubmitNewAddress);
 	////////////////////////////////////////////////////////////////
 	// lookup widget
 	panel2->collapse();
@@ -141,9 +156,15 @@ void AddyPinApp::BuildMainView() {
 	pTable2->elementAt(0, 1)->addWidget(mpInputPin);
 	pTable2->elementAt(0, 1)->setStyleClass("info");
 	mpLookupButton = new WPushButton("Lookup!", pLookupContainer);
+	mpLookupButton->clicked().connect(this, &AddyPinApp::Lookup);
+	////////////////////////////////////////////////////////////////
+	// account management widget
+	panel3->collapse();
+	Wt::WContainerWidget* pAccountContainer = new Wt::WContainerWidget(pTopContainer);
+	panel3->setCentralWidget(pAccountContainer);
+	mpAccountMngmnt = new AddyAccountMngmnt(pAccountContainer, mrDB);
+
 	//////////////////////////////////////////////////////////////
-	//pTable->columnAt(0)->setStyleClass("col1");
-	//pTable2->columnAt(0)->setStyleClass("col1");
 	pTopContainer->addWidget(new WBreak());
 	Wt::WContainerWidget *pResultContainer = new Wt::WContainerWidget(pTopContainer);
 	mResultPanel = new Wt::WPanel(pTopContainer);
@@ -153,33 +174,68 @@ void AddyPinApp::BuildMainView() {
 	mpResult = new WText(pResultContainer);
 	mResultPanel->hide();
 
-	mpSubmitButton->clicked().connect(this, &AddyPinApp::Submit);
-	mpLookupButton->clicked().connect(this, &AddyPinApp::Lookup);
-
-
 }
 /*!
  * take the user given name and address and add them to the data base and assign a new AddyPin to the entry
  */
-std::string AddyPinApp::Assign(std::string address, std::string email) {
-	AddyUserInfo& rUserInfo = mrDB.CreateUserInfo(address, email);
-	std::string pin = mrDB.Add(rUserInfo);
+void AddyPinApp::Assign(std::string address, std::string email) {
+	std::string pin;
+	std::string masterPin;
+	AddyDB::EOperationResult res = mrDB.Add(address, email, pin, masterPin);
+	std::string plainBody;
+	std::string htmlBody;
+	switch (res) {
+	case AddyDB::kSuccess:
+		plainBody = std::string("Thanks for registering another address with us. Your new AddyPin is ");
+		plainBody = plainBody.append(pin);
+		plainBody = plainBody.append("\nShare it with others using the following link");
+		plainBody = plainBody.append(pin).append(".addypin.com\n");
+		plainBody = plainBody.append("Thank you,\nAddypin Admin");
 
-	std::string plainBody = std::string("Thanks for registering your address with us. Your AddyPin is ");
-	plainBody = plainBody.append(pin);
-	plainBody = plainBody.append("Share it with others using the following link");
-	plainBody = plainBody.append("Your <a href=\"").append(pin).append(".addypin.com\"> ").append(pin).append(".addypin.com\n");
-	plainBody = plainBody.append("Thank you,\nAddypin Admin");
+		htmlBody = std::string("<p>Thanks for registering another address with us</p><p>Your new AddyPin is <b>");
+		htmlBody = htmlBody.append(pin).append("</b></p>");
+		htmlBody = htmlBody.append("<p>Share it with others using the following link </p>");
+		htmlBody = htmlBody.append("<p><a href=\"").append(pin).append(".addypin.com\">").append(pin).append(".addypin.com</a></p>");
+		htmlBody = htmlBody.append("<p>Thank you,</p><p>Addypin Admin</p>");
+		SendEmail("Your AddyPin New Address", "AddyPin", email, plainBody, htmlBody);
+		mpResult->setText(std::string("Your new Pin is ").append(pin.c_str()).append(", an email has been sent to ").append(mpInputEmail1->text().narrow()));
+		break;
 
-	std::string htmlBody = std::string("<p>Thanks for registering your address with us</p><p>Your AddyPin is <b>");
-	htmlBody = htmlBody.append(pin).append("</b></p>");
-	htmlBody = htmlBody.append("<p>Share it with others using the following link </p>");
-	htmlBody = htmlBody.append("<p><a href=\"").append(pin).append(".addypin.com\">").append(pin).append(".addypin.com</a></p>");
-	htmlBody = htmlBody.append("<p>Thank you,</p><p>Addypin Admin</p>");
+	case AddyDB::kSuccessNewUse:
+		plainBody = std::string("Thanks for Joining us with your first address. Your first AddyPin is ");
+		plainBody = plainBody.append(pin);
+		plainBody = plainBody.append("\nShare it with others using the following link");
+		plainBody = plainBody.append(pin).append(".addypin.com\n");
+		//plainBody = plainBody.append("your master pin is ").append(masterPin).append(", you will need that to manage your addresses\n");
+		plainBody = plainBody.append("Thank you,\nAddypin Admin");
 
-	SendEmail("Your AddyPin Registration", "Your AddyPin", email, plainBody, htmlBody);
+		htmlBody = std::string("<p>Thanks for joining us with you first address</p><p>Your first AddyPin is <b>");
+		htmlBody = htmlBody.append(pin).append("</b></p>");
+		htmlBody = htmlBody.append("<p>Share it with others using the following link </p>");
+		htmlBody = htmlBody.append("<p><a href=\"").append(pin).append(".addypin.com\">").append(pin).append(".addypin.com</a></p>");
+		//htmlBody = htmlBody.append("<p>your master pin is ").append(masterPin).append(", you will need that to manage your addresses</p>");
+		htmlBody = htmlBody.append("<p>Thank you,</p><p>Addypin Admin</p>");
+		SendEmail("Your AddyPin Registration", "AddyPin", email, plainBody, htmlBody);
+		mpResult->setText(std::string("Your new Pin is ").append(pin.c_str()).append(", an email has been sent to ").append(mpInputEmail1->text().narrow()));
+		break;
 
-	return pin;
+	case AddyDB::kExceededLimit:
+		plainBody = std::string("Thanks for registering your address(es) with us. Unfortunately, Your last trial to create a new AddyPin has failed!");
+		plainBody = plainBody.append("You have exceeded the maximum limit for addresses assigned to the same email address!");
+		//plainBody = plainBody.append("visit www.addypin.com and click manage your address tab, your master pin is ").append(masterPin);
+		plainBody = plainBody.append("Thank you,\nAddypin Admin");
+
+		htmlBody = std::string("<p>Thanks for registering your address with us</p><p>Unfortunately, Your last trial to create a new AddyPin has failed! </p>");
+		htmlBody = htmlBody.append("<p>You have exceeded the maximum limit for addresses assigned to the same email address!</p>");
+		//htmlBody = htmlBody.append("<p>visit <a href=\"www.addypin.com\"> www.addypin.com</a>  and click manage your address tab, your master pin is <b>").append(masterPin).append("</b></p>");
+		htmlBody = htmlBody.append("<p>visit <a href=\"www.addypin.com\"> www.addypin.com</a>  and click manage your address link</p>");
+		htmlBody = htmlBody.append("<p>Thank you,</p><p>Addypin Admin</p>");
+		SendEmail("Your AddyPins exceeded max limit!", "AddyPin", email, plainBody, htmlBody);
+		break;
+
+	default:
+		break;
+	}
 }
 
 void AddyPinApp::SendEmail(std::string subject, std::string from, std::string to, std::string plainBody, std::string htmlBody) {
@@ -195,22 +251,26 @@ void AddyPinApp::SendEmail(std::string subject, std::string from, std::string to
 	client.send(message);
 }
 
-void AddyPinApp::Submit() {
-	if (!mpInputAddress->text().empty() && !mpNameEdit->text().empty()) {
-		std::string pin = Assign(mpInputAddress->text().narrow(), mpNameEdit->text().narrow());
-		mpResult->setText(std::string("Your new Pin is ").append(pin.c_str()).append(", an email has been sent to ").append(mpNameEdit->text().narrow()));
+/*!
+ * handle submit key event new data to the data base, send email bacl to th user and show the new addypin
+ */
+void AddyPinApp::SubmitNewAddress() {
+
+	if (!mpInputAddress->text().empty() && !mpInputEmail1->text().empty()) {
+		Assign(mpInputAddress->text().narrow(), mpInputEmail1->text().narrow());
 	} else {
 		mpResult->setText(std::string("can't have empty address or email fields!!"));
 	}
 	mResultPanel->show();
 }
+
 /*!
  * take the user given AddyPin and lookup the corresponding info
  */
 void AddyPinApp::Lookup() {
 	// validate the AddyPin (only 6 digits) or maybe call a validate function at the AddyPin class
 	std::string pin = mpInputPin->text().narrow();
-	AddyUserInfo retInfo("", "");
-	AddyDB::ELookupResult ret = mrDB.FindByPin(pin, retInfo);
-	BuildLookupView(ret, &retInfo);
+	AddyUserInfo* pRetInfo;
+	AddyDB::EOperationResult ret = mrDB.FindByPin(pin, pRetInfo);
+	BuildLookupView(ret, pRetInfo);
 }

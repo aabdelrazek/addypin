@@ -10,6 +10,7 @@
 
 #include "AddyPin.h"
 #include "AddyUserInfo.h"
+#include "AddyMasterInfo.h"
 #include "AddyPinAllocator.h"
 #include <map>
 #include <list>
@@ -17,31 +18,40 @@
 #include "../utils/inc/CHdfManager.hpp"
 #include "../utils/inc/CHdfFileAdapter.hpp"
 
+using namespace std;
+
 //! the addypin database
 class AddyDB {
 public:
-	typedef enum _LookupResult{
-		kSuccess = 0,
-		kInvalidPin,
-		kNotFound
-	} ELookupResult;
+	typedef enum _OperationResult {
+		kSuccess = 0,		//!< operation succeeded
+		kSuccessNewUse,		//!< adding new address succeeded and the email is a new user
+		kInvalidPin,		//!< given pin is not a valid pin for lookup
+		kNotFound,			//!< the pin seams valid, but no address associated with it
+		kExceededLimit		//!< addition failed because many address entries for the same email
+	} EOperationResult;
 
 	AddyDB();
 	virtual ~AddyDB();
 
-	std::string Add(AddyUserInfo& user);
-	ELookupResult FindByPin(std::string pin, AddyUserInfo& rRet);
-	AddyUserInfo& CreateUserInfo(std::string addr, std::string name);
+	EOperationResult Add(string address, string email, string& rAssignedPin, string& rMasterPin);
+	EOperationResult FindByPin(string pin, AddyUserInfo*& pRet);
+	EOperationResult GetMasterRecord(string masterPin, string email, list< pair<string, string> >& retPairs);
+	EOperationResult SetMasterRecord(string masterPin, string email, list< pair<string, string> >& newPairs);
 	void DumpPinMap();
 	bool SaveMap();
 	bool LoadMap();
+
 private:
-	CHdfFileAdapter mHdfFileAdapter;					//!< file on disk
-	CHdfManager mHdfManager;							//!< HDF formated file manager
-	std::map<std::string, AddyUserInfo&> mUserInfoMap;	//!< map of pins to user info
-	AddyPinAllocator mAddyPinAllocator;					//!< the only allocator for entries in the DB
-	static const std::string kDbPath;
-	static const std::string kDbFile;
+	string AllocateUniquePin(bool master);
+	CHdfFileAdapter mHdfFileAdapter;						//!< file on disk
+	CHdfManager mHdfManager;								//!< HDF formated file manager
+	AddyPinAllocator mAddyPinAllocator;						//!< the only allocator for entries in the DB
+	map<string, AddyUserInfo*> mPinAddressMap;				//!< map of pins to user info
+	map<string, string> mEmailToMPinMap;					//!< map of email to master pin
+	map<string, AddyMasterInfo*> mMPinToInfoListMap;		//!< map of master pin to list of user info
+	static const string kDbPath;							//!< path to data base file
+	static const string kDbFile;							//!< data base file name
 };
 
 #endif /* ADDYDB_H_ */

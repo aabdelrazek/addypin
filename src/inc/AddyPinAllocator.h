@@ -17,10 +17,24 @@ public:
 	virtual ~AddyPinAllocator();
 
 	std::string AllocatePin();
-	bool ValidatePin(std::string val);
+	bool ValidatePin(const std::string& val);
+
+	std::string AllocateMasterPin();
+	bool ValidateMasterPin(const std::string& val);
+
+	static unsigned int ValidPinLength() {return 6;}
+	static unsigned int ValidMasterPinLength() {return 8;}
+
 private:
-	bool ValidNumeric(char& c);
-	bool ValidChar(char& c);
+	bool ValidNumeric(const char& c);
+	bool ValidChar(const char& c);
+	static const int kMinNumAsccii = 48; 			// '0'
+	static const int kMaxNumAscii = 57;				// '9'
+	static const int kMinCharAsccii = 65; 			// 'A'
+	static const int kMaxCharAsccii = 90; 			// 'Z'
+	static const int kMinCharAscciiSmall = 97; 		// 'a'
+	static const int kMaxCharAscciiSmall = 122; 	// 'z'
+
 };
 
 #endif /* ADDYPINALLOCATOR_H_ */

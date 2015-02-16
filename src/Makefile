@@ -63,7 +63,7 @@ all: ${OUTPUT}
 #****************************************************************************
 # Source files
 #****************************************************************************
-SRCS := main.cpp AddyPin.cpp AddyPinAllocator.cpp AddyPinApp.cpp AddyUserInfo.cpp AddyDB.cpp
+SRCS := main.cpp AddyPin.cpp AddyPinAllocator.cpp AddyPinApp.cpp AddyAccountMngmnt.cpp AddyMasterInfo.cpp AddyUserInfo.cpp AddyDB.cpp
 
 # Add on the sources for libraries
 SRCS := ${SRCS}
@@ -94,10 +94,37 @@ depend:
 # DO NOT DELETE
 
 ../build/AddyPin.o: inc/AddyPin.h
-../build/AddyPinAllocator.o: inc/AddyPinAllocator.h inc/AddyUserInfo.h
-../build/AddyPinAllocator.o: inc/AddyPin.h
+../build/AddyPinAllocator.o: inc/AddyPinAllocator.h
 ../build/AddyPinApp.o: inc/AddyPinApp.h inc/AddyDB.h inc/AddyPin.h
-../build/AddyPinApp.o: inc/AddyUserInfo.h inc/AddyPinAllocator.h
-../build/AddyUserInfo.o: inc/AddyUserInfo.h
+../build/AddyPinApp.o: inc/AddyUserInfo.h inc/AddyMasterInfo.h
+../build/AddyPinApp.o: inc/AddyPinAllocator.h utils/inc/CHdfManager.hpp
+../build/AddyPinApp.o: utils/inc/types.h utils/inc/neo_hdf.h
+../build/AddyPinApp.o: utils/inc/neo_err.h utils/inc/neo_misc.h
+../build/AddyPinApp.o: utils/inc/cs_config.h utils/inc/neo_str.h
+../build/AddyPinApp.o: utils/inc/ulist.h utils/inc/neo_hash.h
+../build/AddyPinApp.o: utils/inc/CHdfFileAdapter.hpp
+../build/AddyPinApp.o: utils/inc/IHdfStorage.hpp utils/inc/CPosixFile.hpp
+../build/AddyPinApp.o: utils/inc/IFile.hpp inc/AddyAccountMngmnt.h
+../build/AddyAccountMngmnt.o: inc/AddyAccountMngmnt.h inc/AddyDB.h
+../build/AddyAccountMngmnt.o: inc/AddyPin.h inc/AddyUserInfo.h
+../build/AddyAccountMngmnt.o: inc/AddyMasterInfo.h inc/AddyPinAllocator.h
+../build/AddyAccountMngmnt.o: utils/inc/CHdfManager.hpp utils/inc/types.h
+../build/AddyAccountMngmnt.o: utils/inc/neo_hdf.h utils/inc/neo_err.h
+../build/AddyAccountMngmnt.o: utils/inc/neo_misc.h utils/inc/cs_config.h
+../build/AddyAccountMngmnt.o: utils/inc/neo_str.h utils/inc/ulist.h
+../build/AddyAccountMngmnt.o: utils/inc/neo_hash.h
+../build/AddyAccountMngmnt.o: utils/inc/CHdfFileAdapter.hpp
+../build/AddyAccountMngmnt.o: utils/inc/IHdfStorage.hpp
+../build/AddyAccountMngmnt.o: utils/inc/CPosixFile.hpp utils/inc/IFile.hpp
+../build/AddyMasterInfo.o: inc/AddyMasterInfo.h inc/AddyUserInfo.h
+../build/AddyMasterInfo.o: inc/AddyPin.h utils/inc/strtk.hpp
+../build/AddyUserInfo.o: inc/AddyUserInfo.h inc/AddyPin.h utils/inc/strtk.hpp
 ../build/AddyDB.o: inc/AddyDB.h inc/AddyPin.h inc/AddyUserInfo.h
-../build/AddyDB.o: inc/AddyPinAllocator.h
+../build/AddyDB.o: inc/AddyMasterInfo.h inc/AddyPinAllocator.h
+../build/AddyDB.o: utils/inc/CHdfManager.hpp utils/inc/types.h
+../build/AddyDB.o: utils/inc/neo_hdf.h utils/inc/neo_err.h
+../build/AddyDB.o: utils/inc/neo_misc.h utils/inc/cs_config.h
+../build/AddyDB.o: utils/inc/neo_str.h utils/inc/ulist.h utils/inc/neo_hash.h
+../build/AddyDB.o: utils/inc/CHdfFileAdapter.hpp utils/inc/IHdfStorage.hpp
+../build/AddyDB.o: utils/inc/CPosixFile.hpp utils/inc/IFile.hpp
+../build/AddyDB.o: utils/inc/CException.hpp

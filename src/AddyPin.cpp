@@ -13,10 +13,10 @@ AddyPin::AddyPin() {
 AddyPin::~AddyPin() {
 }
 
-std::string& AddyPin::GetPin() {
+const std::string& AddyPin::GetPin() {
 	return mPin;
 }
 
-void AddyPin::SetPin(std::string val) {
+void AddyPin::SetPin(std::string& val) {
 	mPin = val;
 }

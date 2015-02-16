@@ -7,41 +7,45 @@
 
 #include "inc/AddyUserInfo.h"
 #include "utils/inc/strtk.hpp"
+#include <Wt/WApplication>
 
-AddyUserInfo::AddyUserInfo(std::string addr, std::string user): mAddress(addr), mUserName(user) {
+const std::string AddyUserInfo::kSeparator = "||";
+
+AddyUserInfo::AddyUserInfo(std::string addr, std::string pin): mAddress(addr) {
+	mPin.SetPin(pin);
 }
 
 AddyUserInfo::~AddyUserInfo() {
 }
 
-std::string& AddyUserInfo::GetAddress() {
+const std::string& AddyUserInfo::GetAddress() {
 	return mAddress;
 }
-std::string& AddyUserInfo::GetUserName() {
-	return mUserName;
+
+const std::string& AddyUserInfo::GetPin() {
+	return mPin.GetPin();
 }
 
 /*!
- * decode a 1 string entry from DB file to different fields and return the AddyPin of the entry
+ * decode a 1 string entry from DB file to different fields of the entry
  */
-std::string AddyUserInfo::Deserialize(std::string& rEntry) {
+void AddyUserInfo::Deserialize(const std::string& rEntry) {
 	std::deque<std::string> strList;
-	strtk::parse(rEntry,"||",strList);
-	if (strList.size() == 3) {
+	strtk::parse(rEntry, kSeparator, strList);
+	if (strList.size() == 2) {
 		mAddress = strList[0];
-		mUserName = strList[1];
+		mPin.SetPin(strList[1]);
+	} else {
+		Wt::log("error")<<"AddyUserInfo::Deserialize erorrrrrrrrrrrr";
 	}
-	return strList[2];
 }
 
 /*!
  * encode the user info in 1 string to store to database file and include the given AddyPin in the entry
  */
-std::string AddyUserInfo::Serialize(std::string pin) {
-	std::string ret = mAddress;
-	ret = ret.append("||");
-	ret = ret.append(mUserName);
-	ret = ret.append("||");
-	ret = ret.append(pin);
-	return ret;
+void AddyUserInfo::Serialize(std::string& rEntry) {
+	std::string& ret = rEntry;
+	ret = ret.append(mAddress);
+	ret = ret.append(kSeparator);
+	ret = ret.append(mPin.GetPin());
 }

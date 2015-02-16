@@ -19,14 +19,9 @@ WApplication* createApplication(const WEnvironment& env)
 {
 	AddyDB* db = new AddyDB();
 	WApplication* pApp = NULL;
-	std::string expectedPin = "";
-	AddyUserInfo ret("", "");
-	AddyDB::ELookupResult res;
 
-	if (env.hostName().length() == AddyPin::PinLength() + std::string(".addypin.com").length()) {
-		expectedPin = env.hostName().substr(0, AddyPin::PinLength());
-		res = db->FindByPin(expectedPin, ret);
-		pApp = new AddyPinApp(env, *db, AddyPinApp::kLookupView, res, &ret);
+	if (env.hostName().length() == AddyPinAllocator::ValidPinLength() + std::string(".addypin.com").length()) {
+		pApp = new AddyPinApp(env, *db, AddyPinApp::kLookupView, env.hostName().substr(0, AddyPinAllocator::ValidPinLength()));
 	} else if (env.hostName() == std::string("addypin.com") || env.hostName() == std::string("www.addypin.com")) {
 		pApp = new AddyPinApp(env, *db, AddyPinApp::kMainview);
 	} else {

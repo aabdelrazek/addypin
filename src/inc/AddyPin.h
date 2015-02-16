@@ -15,9 +15,9 @@ public:
 	AddyPin();
 	virtual ~AddyPin();
 
-	std::string& GetPin();
-	void SetPin(std::string val);
-	static unsigned int PinLength() { return 6;}
+	const std::string& GetPin();
+	void SetPin(std::string& val);
+	unsigned int PinLength() { return mPin.length();}
 private:
 	std::string mPin;
 };

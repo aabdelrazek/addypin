@@ -8,25 +8,26 @@
 #ifndef ADDYUSERINFO_H_
 #define ADDYUSERINFO_H_
 #include <string>
-
+#include <AddyPin.h>
 /*! the user info now is just a string with address information, and user name
  * however this might be extended later to contain more information like name, location on a map..etc
  */
 
 class AddyUserInfo {
 public:
-	AddyUserInfo(std::string addr = "", std::string user = "");
+	AddyUserInfo(std::string addr = "", std::string pin = "");
 	virtual ~AddyUserInfo();
 
-	std::string& GetAddress();
-	std::string& GetUserName();
+	const std::string& GetAddress();
+	const std::string& GetPin();
 
-	std::string Deserialize(std::string& rEntry);
-	std::string Serialize(std::string pin);
+	void Deserialize(const std::string& rEntry);
+	void Serialize(std::string& rEntry);
 
 private:
 	std::string mAddress;
-	std::string mUserName;
+	AddyPin mPin;
+	static const std::string kSeparator;
 };
 
 #endif /* ADDYUSERINFO_H_ */
