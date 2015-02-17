@@ -34,10 +34,11 @@ public:
 	AddyDB();
 	virtual ~AddyDB();
 
-	EOperationResult Add(string address, string email, string& rAssignedPin, string& rMasterPin);
+	EOperationResult Add(string address, string email, string& rAssignedPin);
 	EOperationResult FindByPin(string pin, AddyUserInfo*& pRet);
 	EOperationResult GetMasterRecord(string masterPin, string email, list< pair<string, string> >& retPairs);
 	EOperationResult SetMasterRecord(string masterPin, string email, list< pair<string, string> >& newPairs);
+	AddyDB::EOperationResult GetMasterPin(std::string email, std::string& ret);
 	void DumpPinMap();
 	bool SaveMap();
 	bool LoadMap();

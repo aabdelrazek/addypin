@@ -47,17 +47,17 @@ bool AddyPinAllocator::ValidatePin(const std::string& val) {
 }
 
 /*!
- * allocate a 8 digits master pin with the form "NNCCCCNN"
+ * allocate a 8 digits master pin with the form "nnccccnn"
  */
 std::string AddyPinAllocator::AllocateMasterPin() {
 	std::string str = "00000000";
 
 	str[0] = rand() % 10 + kMinNumAsccii;
 	str[1] = rand() % 10 + kMinNumAsccii;
-	str[2] = rand() % 26 + kMinCharAsccii;
-	str[3] = rand() % 26 + kMinCharAsccii;
-	str[4] = rand() % 26 + kMinCharAsccii;
-	str[5] = rand() % 26 + kMinCharAsccii;
+	str[2] = rand() % 26 + kMinCharAscciiSmall;
+	str[3] = rand() % 26 + kMinCharAscciiSmall;
+	str[4] = rand() % 26 + kMinCharAscciiSmall;
+	str[5] = rand() % 26 + kMinCharAscciiSmall;
 	str[6] = rand() % 10 + kMinNumAsccii;
 	str[7] = rand() % 10 + kMinNumAsccii;
 

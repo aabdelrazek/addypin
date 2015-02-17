@@ -20,12 +20,12 @@ using namespace Wt;
 
 class AddyAccountMngmnt: public WObject {
 public:
-	AddyAccountMngmnt(Wt::WContainerWidget* pAccountContainer, AddyDB& rDB);
+	AddyAccountMngmnt(Wt::WContainerWidget* pContainer, AddyDB& rDB, std::string masterPin);
 
 private:
+	std::string mMasterPin;
 	AddyDB& mrDB;
 	list< pair<string, string> > mPairs;//!< pin/address pairs
-	WLineEdit* mpInputMasterPin;		//!< UI for user to put address description or AddyPin for address lookup!
 	WLineEdit* mpInputEmail; 			//!< UI for user to put his name
 	WPushButton* mpAccountButton;		//!< To submit new entry and allocate a new AddyPin for it
 	Wt::WTable* mpTable;				//!< table holding all UI elements of the account management

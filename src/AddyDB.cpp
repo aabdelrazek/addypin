@@ -14,6 +14,21 @@
 const string AddyDB::kDbPath = "./";
 const string AddyDB::kDbFile = "addypin_data.hdf";
 
+static std::string LowerCase(std::string s) {
+	string sLC;
+	sLC.resize(s.size());
+	transform(s.begin(), s.end(), sLC.begin(), ::tolower);
+	return sLC;
+}
+
+static std::string UpperCase(std::string s) {
+	string sLC;
+	sLC.resize(s.size());
+	transform(s.begin(), s.end(), sLC.begin(), ::toupper);
+	return sLC;
+}
+
+
 AddyDB::AddyDB() :
 		mHdfFileAdapter(kDbPath+kDbFile),
 		mHdfManager(&mHdfFileAdapter) {
@@ -49,34 +64,35 @@ string AddyDB::AllocateUniquePin(bool master) {
 }
 
 
-AddyDB::EOperationResult AddyDB::Add(string address, string email, string& rAssignedPin, string& rMasterPin) {
+AddyDB::EOperationResult AddyDB::Add(string address, string email, string& rAssignedPin) {
 	AddyDB::EOperationResult ret = kSuccess;
 	string pin = AllocateUniquePin(false);
+	string pinLC = LowerCase(pin);
+	string emailLC = LowerCase(email);
 	string masterPin = "";
 	AddyMasterInfo* pMasterRecord = NULL;
 	// if email is first time here, assign it a master pin as well
-	if (mEmailToMPinMap.count(email) == 0) {
+	if (mEmailToMPinMap.count(emailLC) == 0) {
 		masterPin = AllocateUniquePin(true);
-		mEmailToMPinMap[email] = masterPin;
-		pMasterRecord = new AddyMasterInfo(email, masterPin);
+		string masterPinLC = LowerCase(masterPin);
+		mEmailToMPinMap[emailLC] = masterPinLC;
+		pMasterRecord = new AddyMasterInfo(emailLC, masterPinLC);
 		mMPinToInfoListMap[masterPin] = pMasterRecord;
 		ret = kSuccessNewUse;
 	} else {
-		masterPin = mEmailToMPinMap[email];
+		masterPin = mEmailToMPinMap[emailLC];
 		pMasterRecord = mMPinToInfoListMap[masterPin];
 	}
 
-	AddyUserInfo* pNewEntry = new AddyUserInfo(address, pin);
+	AddyUserInfo* pNewEntry = new AddyUserInfo(address, pinLC);
 	if (pMasterRecord->AddNewEntry(pNewEntry)) {
-		mPinAddressMap[pin] = pNewEntry;
+		mPinAddressMap[pinLC] = pNewEntry;
 		SaveMap();
 		rAssignedPin = pin;
-		rMasterPin = masterPin;
 	} else {
 		// adding new entry failed, same user exceeded max number of entries!
 		delete pNewEntry;
 		ret = kExceededLimit;
-		rMasterPin = masterPin;
 	}
 
 	return ret;
@@ -148,15 +164,13 @@ void AddyDB::DumpPinMap() {
 
 AddyDB::EOperationResult AddyDB::FindByPin(string pin, AddyUserInfo*& pRet) {
 	EOperationResult ret = kNotFound;
-	string pinLowerCase;
-	pinLowerCase.resize(pin.size());
-	transform(pin.begin(), pin.end(), pinLowerCase.begin(), ::toupper);
+	std::string pinLC = LowerCase(pin);
 
-	if (!mAddyPinAllocator.ValidatePin(pinLowerCase)) {
+	if (!mAddyPinAllocator.ValidatePin(pinLC)) {
 		ret = kInvalidPin;
 	}
-	if (mPinAddressMap.count(pinLowerCase) != 0) {
-		map<string, AddyUserInfo*>::iterator it = mPinAddressMap.find(pinLowerCase);
+	if (mPinAddressMap.count(pinLC) != 0) {
+		map<string, AddyUserInfo*>::iterator it = mPinAddressMap.find(pinLC);
 		pRet = it->second;
 		ret = kSuccess;
 	}
@@ -169,12 +183,13 @@ AddyDB::EOperationResult AddyDB::FindByPin(string pin, AddyUserInfo*& pRet) {
  */
 AddyDB::EOperationResult AddyDB::GetMasterRecord(string masterPin, string email, list< pair<string, string> >& retPairs) {
 	AddyDB::EOperationResult ret = kSuccess;
-	if (mEmailToMPinMap.count(email) != 0 && mEmailToMPinMap[email] == masterPin) {
+	std::string emailLC = LowerCase(email);
+	if (mEmailToMPinMap.count(emailLC) != 0 && mEmailToMPinMap[emailLC] == masterPin) {
 		AddyMasterInfo* pInfo = mMPinToInfoListMap[masterPin];
 		retPairs.clear();
 		for (unsigned int i = 0; i < pInfo->GetNumEntries(); i++) {
 			AddyUserInfo* pEntry = pInfo->GetEntry(i);
-			retPairs.push_back(pair<string, string>(pEntry->GetPin(), pEntry->GetAddress()));
+			retPairs.push_back(pair<string, string>(UpperCase(pEntry->GetPin()), pEntry->GetAddress()));
 		}
 
 	} else {
@@ -189,7 +204,8 @@ AddyDB::EOperationResult AddyDB::GetMasterRecord(string masterPin, string email,
  */
 AddyDB::EOperationResult AddyDB::SetMasterRecord(string masterPin, string email, list< pair<string, string> >& newPairs) {
 	AddyDB::EOperationResult ret = kSuccess;
-	if (mEmailToMPinMap.count(email) != 0 && mEmailToMPinMap[email] == masterPin) {
+	std::string emailLC = LowerCase(email);
+	if (mEmailToMPinMap.count(emailLC) != 0 && mEmailToMPinMap[emailLC] == masterPin) {
 		AddyMasterInfo* pInfo = mMPinToInfoListMap[masterPin];
 
 		// remove pin/address pairs of this master record from the map first
@@ -214,5 +230,15 @@ AddyDB::EOperationResult AddyDB::SetMasterRecord(string masterPin, string email,
 		ret = kNotFound;
 	}
 
+	return ret;
+}
+
+AddyDB::EOperationResult AddyDB::GetMasterPin(std::string email, std::string& retMPin) {
+	AddyDB::EOperationResult ret = kNotFound;
+	std::string emailLC = LowerCase(email);
+	if (mEmailToMPinMap.count(emailLC) != 0) {
+		retMPin = mEmailToMPinMap[emailLC];
+		ret = kSuccess;
+	}
 	return ret;
 }

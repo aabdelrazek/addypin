@@ -7,7 +7,7 @@ LD     := $(CROSS_COMPILE)ld
 AR     := $(CROSS_COMPILE)ar
 RANLIB := $(CROSS_COMPILE)ranlib
 
-DEBUG_CFLAGS     := -Wall -Wno-format -g -DDEBUG -Wcpp -DBOOST_SIGNALS_NO_DEPRECATION_WARNING
+DEBUG_CFLAGS     := -Wall -Wno-format -g -DDEBUG -Wcpp -DBOOST_SIGNALS_NO_DEPRECATION_WARNING -std=c++11
 RELEASE_CFLAGS   := -Wall -Wno-unknown-pragmas -Wno-format -O3
 
 LIBS		     := -lstdc++ -lwt -lwthttp -lboost_signals -lwtfcgi -lutils
@@ -63,7 +63,7 @@ all: ${OUTPUT}
 #****************************************************************************
 # Source files
 #****************************************************************************
-SRCS := main.cpp AddyPin.cpp AddyPinAllocator.cpp AddyPinApp.cpp AddyAccountMngmnt.cpp AddyMasterInfo.cpp AddyUserInfo.cpp AddyDB.cpp
+SRCS := main.cpp AddyPin.cpp AddyPinAllocator.cpp AddyPinApp.cpp AddyAccountMngmnt.cpp AddyMasterInfo.cpp AddyUserInfo.cpp AddyInfoDialog.cpp AddyDB.cpp
 
 # Add on the sources for libraries
 SRCS := ${SRCS}
@@ -105,6 +105,7 @@ depend:
 ../build/AddyPinApp.o: utils/inc/CHdfFileAdapter.hpp
 ../build/AddyPinApp.o: utils/inc/IHdfStorage.hpp utils/inc/CPosixFile.hpp
 ../build/AddyPinApp.o: utils/inc/IFile.hpp inc/AddyAccountMngmnt.h
+../build/AddyPinApp.o: inc/AddyInfoDialog.h
 ../build/AddyAccountMngmnt.o: inc/AddyAccountMngmnt.h inc/AddyDB.h
 ../build/AddyAccountMngmnt.o: inc/AddyPin.h inc/AddyUserInfo.h
 ../build/AddyAccountMngmnt.o: inc/AddyMasterInfo.h inc/AddyPinAllocator.h
@@ -119,6 +120,7 @@ depend:
 ../build/AddyMasterInfo.o: inc/AddyMasterInfo.h inc/AddyUserInfo.h
 ../build/AddyMasterInfo.o: inc/AddyPin.h utils/inc/strtk.hpp
 ../build/AddyUserInfo.o: inc/AddyUserInfo.h inc/AddyPin.h utils/inc/strtk.hpp
+../build/AddyInfoDialog.o: inc/AddyInfoDialog.h
 ../build/AddyDB.o: inc/AddyDB.h inc/AddyPin.h inc/AddyUserInfo.h
 ../build/AddyDB.o: inc/AddyMasterInfo.h inc/AddyPinAllocator.h
 ../build/AddyDB.o: utils/inc/CHdfManager.hpp utils/inc/types.h

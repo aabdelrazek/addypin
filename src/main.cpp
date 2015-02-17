@@ -21,11 +21,19 @@ WApplication* createApplication(const WEnvironment& env)
 	WApplication* pApp = NULL;
 
 	if (env.hostName().length() == AddyPinAllocator::ValidPinLength() + std::string(".addypin.com").length()) {
-		pApp = new AddyPinApp(env, *db, AddyPinApp::kLookupView, env.hostName().substr(0, AddyPinAllocator::ValidPinLength()));
+		pApp = new AddyPinApp(env,
+				*db, AddyPinApp::kLookupView,
+				env.hostName().substr(0, AddyPinAllocator::ValidPinLength()));
+
 	} else if (env.hostName() == std::string("addypin.com") || env.hostName() == std::string("www.addypin.com")) {
-		pApp = new AddyPinApp(env, *db, AddyPinApp::kMainview);
-	} else {
-		pApp = new WApplication(env);
+		pApp = new AddyPinApp(env,
+				*db,
+				AddyPinApp::kMainview);
+
+	} else if (env.hostName().length() == AddyPinAllocator::ValidMasterPinLength() + std::string(".addypin.com").length()) {
+		pApp = new AddyPinApp(env,
+				*db, AddyPinApp::kAccountManagementView,
+				env.hostName().substr(0, AddyPinAllocator::ValidMasterPinLength()));
 	}
 
 	return pApp;
