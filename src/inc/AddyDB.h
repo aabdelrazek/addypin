@@ -39,11 +39,11 @@ public:
 	EOperationResult GetMasterRecord(string masterPin, string email, list< pair<string, string> >& retPairs);
 	EOperationResult SetMasterRecord(string masterPin, string email, list< pair<string, string> >& newPairs);
 	AddyDB::EOperationResult GetMasterPin(std::string email, std::string& ret);
+
+private:
 	void DumpPinMap();
 	bool SaveMap();
 	bool LoadMap();
-
-private:
 	string AllocateUniquePin(bool master);
 	CHdfFileAdapter mHdfFileAdapter;						//!< file on disk
 	CHdfManager mHdfManager;								//!< HDF formated file manager

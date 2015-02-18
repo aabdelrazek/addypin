@@ -47,8 +47,9 @@ AddyAccountMngmnt::AddyAccountMngmnt(Wt::WContainerWidget* pContainer, AddyDB& r
 void AddyAccountMngmnt::ManageAddress() {
 	if (mpAccountButton->text() == kIdMngAddresses) {
 		if (!mpInputEmail->text().empty()) {
-			if (mpInputEmail->text().narrow().find('@') != string::npos) {
-				mrDB.GetMasterRecord(mMasterPin, mpInputEmail->text().narrow(), mPairs);
+			if (mpInputEmail->text().toUTF8().find('@') != string::npos) {
+				// todo process return from GetMasterRecord
+				mrDB.GetMasterRecord(mMasterPin, mpInputEmail->text().toUTF8(), mPairs);
 				if (mPairs.size() > 0) {
 					mppCheckDelete = new WCheckBox*[mPairs.size()];
 					mppAddresses = new WTextArea*[mPairs.size()];
@@ -90,14 +91,13 @@ void AddyAccountMngmnt::ManageAddress() {
 		int i = 0;
 		for (it = mPairs.begin(); it != mPairs.end(); it++, i++) {
 			if (!mppCheckDelete[i]->isChecked()) {
-				newPairs.push_back(pair<string, string>(it->first, mppAddresses[i]->text().narrow()));
+				newPairs.push_back(pair<string, string>(it->first, mppAddresses[i]->text().toUTF8()));
 			} else {
 				// deleted entry
 				printf("deleted %s\n", it->second.c_str());
 			}
 		}
-		mrDB.SetMasterRecord(mMasterPin, mpInputEmail->text().narrow(), newPairs);
-		mrDB.SaveMap();
+		mrDB.SetMasterRecord(mMasterPin, mpInputEmail->text().toUTF8(), newPairs);
 		mpTable->deleteRow(2);
 		mpAccountButton->setText(kIdMngAddresses);
 	}

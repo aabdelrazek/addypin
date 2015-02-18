@@ -107,7 +107,7 @@ bool AddyDB::SaveMap() {
 		Wt::log("debug")<<"SaveMap: file not created, create it now";
 		mHdfManager.Create();
 	}
-
+	mHdfManager.Reset();
 	mHdfManager.SetFieldValue(mMPinToInfoListMap.size(), "numEntries");
 	int i = 0;
 	for (map<string, AddyMasterInfo*>::iterator it = mMPinToInfoListMap.begin(); it != mMPinToInfoListMap.end(); it++, i++) {
@@ -212,19 +212,32 @@ AddyDB::EOperationResult AddyDB::SetMasterRecord(string masterPin, string email,
 		for (unsigned int i = 0; i < pInfo->GetNumEntries(); i++) {
 			AddyUserInfo* pUi = pInfo->GetEntry(i);
 			map<string, AddyUserInfo*>::iterator it = mPinAddressMap.find(pUi->GetPin());
-			delete pUi;
 			mPinAddressMap.erase(it);
+			delete pUi;
 		}
 		// delete all entries in this master record
 		pInfo->DeleteAllEntries();
 
-		// now iterate through the new set of pairs, and add them to both maps
-		list< pair<string, string> >::iterator it;
-		for (it = newPairs.begin(); it != newPairs.end(); it++) {
-			AddyUserInfo* pEntry = new AddyUserInfo(it->second, it->first);
-			mPinAddressMap[it->first] = pEntry;
-			pInfo->AddNewEntry(pEntry);
+		// special case when user deleted, all his addresses!
+		if (newPairs.size() == 0) {
+			printf("deleting %s entirely\n", emailLC.c_str());
+			// delete email to pin entry
+			map<string, string>::iterator it = mEmailToMPinMap.find(emailLC);
+			mEmailToMPinMap.erase(it);
+			//delete pin to master info entry
+			map<string, AddyMasterInfo*>::iterator it2 = mMPinToInfoListMap.find(masterPin);
+			mMPinToInfoListMap.erase(it2);
+			delete pInfo;
+		} else {
+			// now iterate through the new set of pairs, and add them to both maps
+			list< pair<string, string> >::iterator it;
+			for (it = newPairs.begin(); it != newPairs.end(); it++) {
+				AddyUserInfo* pEntry = new AddyUserInfo(it->second, LowerCase(it->first));
+				mPinAddressMap[LowerCase(it->first)] = pEntry;
+				pInfo->AddNewEntry(pEntry);
+			}
 		}
+		SaveMap();
 
 	} else {
 		ret = kNotFound;

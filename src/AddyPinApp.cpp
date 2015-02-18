@@ -174,14 +174,12 @@ bool AddyPinApp::Assign(std::string address, std::string email, std::string& rPi
 		plainBody = plainBody.append(rPin);
 		plainBody = plainBody.append(kIdShareItPlain);
 		plainBody = plainBody.append(rPin).append(".addypin.com\n");
-		//plainBody = plainBody.append("your master pin is ").append(masterPin).append(", you will need that to manage your addresses\n");
 		plainBody = plainBody.append(kIdEndOfMailPlain);
 
 		htmlBody = std::string(kIdFrstThankUHtml);
 		htmlBody = htmlBody.append(rPin).append("</b></p>");
 		htmlBody = htmlBody.append(kIdShareItHtml);
 		htmlBody = htmlBody.append("<p><a href=\"").append(rPin).append(".addypin.com\">").append(rPin).append(".addypin.com</a></p>");
-		//htmlBody = htmlBody.append("<p>your master pin is ").append(masterPin).append(", you will need that to manage your addresses</p>");
 		htmlBody = htmlBody.append(kIdEndOfMailHtml);
 		SendEmail(kIdYourNewPin, "AddyPin", email, plainBody, htmlBody);
 		ret = true;
@@ -216,9 +214,9 @@ void AddyPinApp::SendEmail(std::string subject, std::string from, std::string to
 void AddyPinApp::SubmitNewAddress() {
 	std::string pin = "";
 	if (!mpInputAddress->text().empty() && !mpInputEmail->text().empty()) {
-		if (mpInputEmail->text().narrow().find('@') != string::npos) {
-			if (Assign(mpInputAddress->text().narrow(), mpInputEmail->text().narrow(), pin)) {
-				AddyInfoDialog info("Success", std::string("Your new Pin is ").append(pin.c_str()).append(", an email has been sent to ").append(mpInputEmail->text().narrow()));
+		if (mpInputEmail->text().toUTF8().find('@') != string::npos) {
+			if (Assign(mpInputAddress->text().toUTF8(), mpInputEmail->text().toUTF8(), pin)) {
+				AddyInfoDialog info(kIdSuccess, std::string(kIdYourNewPinIs).append(pin.c_str()).append(kIdAnEmailSent).append(mpInputEmail->text().toUTF8()));
 			} else {
 				AddyInfoDialog info(kIdFailed, kIdMaxLimit);
 			}
@@ -234,7 +232,7 @@ void AddyPinApp::SubmitNewAddress() {
  * take the user given AddyPin and lookup the corresponding info
  */
 void AddyPinApp::Lookup() {
-	std::string res = LookupAddress(mpInputPin->text().narrow());
+	std::string res = LookupAddress(mpInputPin->text().toUTF8());
 
 	if (!mpResult) {
 		mpResult = new WText(mpContainer);
@@ -271,7 +269,7 @@ std::string AddyPinApp::LookupAddress(std::string pinToLookup) {
 void AddyPinApp::Manage() {
 	if (!mpInputEmail2->text().empty()) {
 		std::string masterPin = "";
-		AddyDB::EOperationResult ret = mrDB.GetMasterPin(mpInputEmail2->text().narrow(), masterPin);
+		AddyDB::EOperationResult ret = mrDB.GetMasterPin(mpInputEmail2->text().toUTF8(), masterPin);
 		if (ret == AddyDB::kSuccess) {
 			std::string plainBody;
 			std::string htmlBody;
@@ -286,7 +284,7 @@ void AddyPinApp::Manage() {
 			htmlBody = htmlBody.append("<p>").append(kIdWillSendYouPlain).append("</p>");
 			htmlBody = htmlBody.append("<p><a href=\"").append(masterPin).append(".addypin.com\">").append(masterPin).append(".addypin.com</a></p>");
 			htmlBody = htmlBody.append(kIdEndOfMailHtml);
-			SendEmail(kIdYourMngmntLink, "AddyPin", mpInputEmail2->text().narrow(), plainBody, htmlBody);
+			SendEmail(kIdYourMngmntLink, "AddyPin", mpInputEmail2->text().toUTF8(), plainBody, htmlBody);
 
 			AddyInfoDialog info(kIdSuccess, kIdEmailSentMsg);
 		} else if (ret == AddyDB::kNotFound) {
