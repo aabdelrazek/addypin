@@ -16,7 +16,7 @@
 #include <Wt/WText>
 #include <Wt/WTextArea>
 #include <Wt/WPanel>
-
+#include "AddyInfoDialog.h"
 #include "AddyDB.h"
 
 using namespace Wt;
@@ -37,7 +37,7 @@ public:
 				AddyDB& rDB,
 				AppStartupView view,
 				std::string pinToLookup="");
-
+	~AddyPinApp();
 private:
 	AppStartupView	mStartupView;	//!< initial view of the web page, if accesses via a subdomain as a pin, will jumt to show result
 	AddyDB& mrDB;					//!< reference to main Addy Pin Database
@@ -64,6 +64,7 @@ private:
 
     Wt::WPanel *mResultPanel;
 
+    AddyInfoDialog mInfoDialog;
     void SubmitNewAddress();
     void Lookup();
     void Manage();

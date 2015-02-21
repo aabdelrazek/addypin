@@ -1,3 +1,6 @@
+#ifndef _ADDY_INFO_DIALOG_
+#define _ADDY_INFO_DIALOG_
+
 #include <Wt/WContainerWidget>
 #include <Wt/WMessageBox>
 #include <Wt/WPushButton>
@@ -5,8 +8,12 @@
 
 class AddyInfoDialog {
 public:
-	AddyInfoDialog(std::string title, std::string textMsg);
-
+	AddyInfoDialog();
+	void Show(std::string title, std::string textMsg);
 private:
-	Wt::WMessageBox *mpMessageBox;
+	Wt::WMessageBox mMessageBox;
+	AddyInfoDialog(AddyInfoDialog const&) = delete;
+    void operator=(AddyInfoDialog const&) = delete;
 };
+
+#endif //_ADDY_INFO_DIALOG_

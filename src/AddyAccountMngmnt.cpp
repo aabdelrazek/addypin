@@ -6,7 +6,6 @@
  */
 
 #include "inc/AddyAccountMngmnt.h"
-#include "inc/AddyInfoDialog.h"
 #include "inc/AddyText.h"
 #include <Wt/WTemplate>
 #include <Wt/Mail/Client>
@@ -44,6 +43,12 @@ AddyAccountMngmnt::AddyAccountMngmnt(Wt::WContainerWidget* pContainer, AddyDB& r
 	mpAccountButton->clicked().connect(this, &AddyAccountMngmnt::ManageAddress);
 }
 
+AddyAccountMngmnt::~AddyAccountMngmnt() {
+	delete mpAccountButton;
+	delete mpInputEmail;
+	delete mpTable;
+}
+
 void AddyAccountMngmnt::ManageAddress() {
 	if (mpAccountButton->text() == kIdMngAddresses) {
 		if (!mpInputEmail->text().empty()) {
@@ -77,13 +82,13 @@ void AddyAccountMngmnt::ManageAddress() {
 					mpTable->elementAt(2, 1)->setStyleClass("info");
 				} else {
 					// invalid account link!
-					AddyInfoDialog info(kIdError, kIdEmailLinkNotMatch);
+					mInfoDialog.Show(kIdError, kIdEmailLinkNotMatch);
 				}
 			} else {
-				AddyInfoDialog info(kIdError, kIdInvalidEmail);
+				mInfoDialog.Show(kIdError, kIdInvalidEmail);
 			}
 		} else {
-			AddyInfoDialog info(kIdError, kIdEmptyEmail);
+			mInfoDialog.Show(kIdError, kIdEmptyEmail);
 		}
 	} else {
 		list< pair<string, string> > newPairs;
@@ -93,8 +98,7 @@ void AddyAccountMngmnt::ManageAddress() {
 			if (!mppCheckDelete[i]->isChecked()) {
 				newPairs.push_back(pair<string, string>(it->first, mppAddresses[i]->text().toUTF8()));
 			} else {
-				// deleted entry
-				printf("deleted %s\n", it->second.c_str());
+				// user deleting an entry
 			}
 		}
 		mrDB.SetMasterRecord(mMasterPin, mpInputEmail->text().toUTF8(), newPairs);

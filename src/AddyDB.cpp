@@ -10,9 +10,11 @@
 #include <stdio.h>
 #include "utils/inc/CException.hpp"
 #include <Wt/WApplication>
+#include <Wt/WLogger>
+#include "tinyxml/tinyxml.h"
 
 const string AddyDB::kDbPath = "./";
-const string AddyDB::kDbFile = "addypin_data.hdf";
+const string AddyDB::kDbFile = "addypin_data.xml";
 
 static std::string LowerCase(std::string s) {
 	string sLC;
@@ -28,15 +30,13 @@ static std::string UpperCase(std::string s) {
 	return sLC;
 }
 
-
-AddyDB::AddyDB() :
-		mHdfFileAdapter(kDbPath+kDbFile),
-		mHdfManager(&mHdfFileAdapter) {
+AddyDB::AddyDB(Wt::WLogger& rLogger) :
+		mrLog(rLogger) {
 	// intentionally left blank
 	try {
 		LoadMap();
 	} catch (CException& e) {
-		Wt::log("error")<<"no data to load!!!!!";
+		mrLog.entry("error") <<"no data to load!!!!!";
 	}
 }
 
@@ -44,7 +44,7 @@ AddyDB::~AddyDB() {
 	try {
 		SaveMap();
 	}catch (CException& e) {
-		Wt::log("error")<<"Failed to save!!!!!";
+		mrLog.entry("error")<<"Failed to save!!!!!";
 	}
 }
 
@@ -102,64 +102,79 @@ AddyDB::EOperationResult AddyDB::Add(string address, string email, string& rAssi
  * save data base from memory to file system
  */
 bool AddyDB::SaveMap() {
+	TiXmlDocument doc;
 
-	if (!mHdfManager.IsCreated()) {
-		Wt::log("debug")<<"SaveMap: file not created, create it now";
-		mHdfManager.Create();
-	}
-	mHdfManager.Reset();
-	mHdfManager.SetFieldValue(mMPinToInfoListMap.size(), "numEntries");
-	int i = 0;
-	for (map<string, AddyMasterInfo*>::iterator it = mMPinToInfoListMap.begin(); it != mMPinToInfoListMap.end(); it++, i++) {
-		string str = "";
-		it->second->Serialize(str);
-		mHdfManager.SetFieldText(str, "e%d", i);
-	}
+	TiXmlElement* pNumEntries = new TiXmlElement("num_users");
 
-	mHdfManager.ExportData(true);
-	return true;
+	char nn[10];
+	sprintf(nn, "%lu", mMPinToInfoListMap.size());
+
+	pNumEntries->LinkEndChild(new TiXmlText(nn));
+	doc.LinkEndChild(pNumEntries);
+
+	if (mMPinToInfoListMap.size() > 0) {
+		TiXmlElement* pElements = new TiXmlElement("all_users");
+		doc.LinkEndChild(pElements);
+		for (map<string, AddyMasterInfo*>::iterator it = mMPinToInfoListMap.begin(); it != mMPinToInfoListMap.end(); it++) {
+			TiXmlElement* pElement = new TiXmlElement("user");
+			it->second->Serialize(pElement);
+			pElements->LinkEndChild(pElement);
+		}
+	}
+	return doc.SaveFile((kDbPath+kDbFile).c_str());
 }
 
 /*!
  * load data base from file system into memory
  */
 bool AddyDB::LoadMap() {
-	Wt::log("debug")<<"Loading DB file!!";
-	if (mHdfManager.IsFilePresent()) {
-		if (!mHdfManager.IsCreated()) {
-			mHdfManager.Create();
-		}
-		mHdfManager.ImportData();
-		unsigned int totalEntries  = mHdfManager.GetFieldValue("numEntries");
-		for (unsigned int i = 0; i < totalEntries; i++) {
-			AddyMasterInfo* pMasterRecord = new AddyMasterInfo();
-			string entry = mHdfManager.GetFieldText("e%d", i);
-			pMasterRecord->Deserialize(entry);
-			pair<map<string, AddyMasterInfo*>::iterator, bool> ret;
-			ret = mMPinToInfoListMap.insert(pair<string, AddyMasterInfo*>(pMasterRecord->GetMasterPin(), pMasterRecord));
-			if (ret.second == false) {
-				Wt::log("error")<<"LoadMap: insertion FAILED, should never occur!!";
-				return false;
-			} else {
-				// let's update other maps as well.
-				mEmailToMPinMap[pMasterRecord->GetEmail()] = pMasterRecord->GetMasterPin();
-				for (unsigned int i = 0; i < pMasterRecord->GetNumEntries(); i++) {
-					mPinAddressMap[pMasterRecord->GetEntry(i)->GetPin()] = pMasterRecord->GetEntry(i);
+	bool ret = false;
+	TiXmlDocument doc((kDbPath+kDbFile).c_str());
+	bool loadOkay = doc.LoadFile();
+	if (!loadOkay) {
+		Wt::log("error")<<"Could not load DB file, Error="<< doc.ErrorDesc() << "Exiting";
+	}
+
+	TiXmlElement* pNumEntries = doc.FirstChildElement("num_users");
+	unsigned int numEntries = 0;
+	if (pNumEntries) {
+		sscanf(pNumEntries->FirstChild()->Value(), "%d", &numEntries);
+
+		if (numEntries > 0) {
+			TiXmlElement* pElements = doc.FirstChildElement("all_users");
+			if (pElements) {
+				TiXmlElement* pItterator = pElements->FirstChildElement("user");
+				unsigned int i = 0;
+
+				while (pItterator && i++ < numEntries) {
+					AddyMasterInfo* pMasterRecord = new AddyMasterInfo();
+					pMasterRecord->Deserialize(pItterator);
+					pair<map<string, AddyMasterInfo*>::iterator, bool> ret;
+					ret = mMPinToInfoListMap.insert(pair<string, AddyMasterInfo*>(pMasterRecord->GetMasterPin(), pMasterRecord));
+					if (ret.second == false) {
+						Wt::log("error")<<"LoadMap: insertion FAILED, should never occur!!";
+						return false;
+					} else {
+						// let's update other maps as well.
+						mEmailToMPinMap[pMasterRecord->GetEmail()] = pMasterRecord->GetMasterPin();
+						for (unsigned int i = 0; i < pMasterRecord->GetNumEntries(); i++) {
+							mPinAddressMap[pMasterRecord->GetEntry(i)->GetPin()] = pMasterRecord->GetEntry(i);
+						}
+					}
+					pItterator = pItterator->NextSiblingElement("user");
 				}
 			}
 		}
-	} else {
-		Wt::log("debug")<<"no DB file!!";
 	}
-	return true;
+	return ret;
 }
 
 void AddyDB::DumpPinMap() {
-	Wt::log("debug")<<"=======================";
+	mrLog.entry("debug")<<"=======================";
 	for (map<string, AddyMasterInfo*>::iterator it = mMPinToInfoListMap.begin(); it != mMPinToInfoListMap.end(); it++) {
-		Wt::log("debug")<<"pin map entry with key @ "<< &(it->first) <<"= " << it->first.c_str() << "and data @ " << &(it->second);
+		mrLog.entry("debug")<<"pin map entry with key @ "<< &(it->first) <<"= " << it->first.c_str() << "and data @ " << &(it->second);
 	}
-	Wt::log("debug")<<"=======================";
+	mrLog.entry("debug")<<"=======================";
 }
 
 AddyDB::EOperationResult AddyDB::FindByPin(string pin, AddyUserInfo*& pRet) {
@@ -191,7 +206,6 @@ AddyDB::EOperationResult AddyDB::GetMasterRecord(string masterPin, string email,
 			AddyUserInfo* pEntry = pInfo->GetEntry(i);
 			retPairs.push_back(pair<string, string>(UpperCase(pEntry->GetPin()), pEntry->GetAddress()));
 		}
-
 	} else {
 		ret = kNotFound;
 	}
@@ -220,7 +234,6 @@ AddyDB::EOperationResult AddyDB::SetMasterRecord(string masterPin, string email,
 
 		// special case when user deleted, all his addresses!
 		if (newPairs.size() == 0) {
-			printf("deleting %s entirely\n", emailLC.c_str());
 			// delete email to pin entry
 			map<string, string>::iterator it = mEmailToMPinMap.find(emailLC);
 			mEmailToMPinMap.erase(it);

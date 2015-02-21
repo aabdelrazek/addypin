@@ -7,7 +7,6 @@
 
 #include "inc/AddyPinApp.h"
 #include "inc/AddyAccountMngmnt.h"
-#include "inc/AddyInfoDialog.h"
 #include "inc/AddyText.h"
 #include <Wt/WTemplate>
 #include <Wt/Mail/Client>
@@ -67,21 +66,34 @@ AddyPinApp::AddyPinApp(const WEnvironment& env, AddyDB& rDB, AppStartupView view
     mpContainer->addWidget(new WBreak());
     mpContainer->addWidget(new WBreak());
 
-        switch(mStartupView) {
-		case kMainview:
-			BuildMainView();
-			break;
+	switch(mStartupView) {
+	case kMainview:
+		BuildMainView();
+		break;
 
-		case kAccountManagementView:
-			mpAccountMngmnt = new AddyAccountMngmnt(new Wt::WContainerWidget(mpContainer), mrDB, pinToLookup);
-			break;
+	case kAccountManagementView:
+		mpAccountMngmnt = new AddyAccountMngmnt(new Wt::WContainerWidget(mpContainer), mrDB, pinToLookup);
+		break;
 
-		case kLookupView:
-			std::string res = LookupAddress(pinToLookup);
-			mpResult = new WText(new Wt::WContainerWidget(root()));
-			mpResult->setText(res);
-			break;
+	case kLookupView:
+		std::string res = LookupAddress(pinToLookup);
+		mpResult = new WText(new Wt::WContainerWidget(root()));
+		mpResult->setText(res);
+		break;
     }
+}
+AddyPinApp::~AddyPinApp() {
+	delete mResultPanel;
+	delete mpResult;
+	delete mpAccountMngmnt;
+	delete mpManageButton;
+	delete mpInputEmail2;
+	delete mpLookupButton;
+	delete mpInputPin;
+	delete mpSubmitButton;
+	delete mpInputEmail;
+	delete mpInputAddress;
+	delete mpContainer;
 }
 
 void AddyPinApp::BuildMainView() {
@@ -216,15 +228,15 @@ void AddyPinApp::SubmitNewAddress() {
 	if (!mpInputAddress->text().empty() && !mpInputEmail->text().empty()) {
 		if (mpInputEmail->text().toUTF8().find('@') != string::npos) {
 			if (Assign(mpInputAddress->text().toUTF8(), mpInputEmail->text().toUTF8(), pin)) {
-				AddyInfoDialog info(kIdSuccess, std::string(kIdYourNewPinIs).append(pin.c_str()).append(kIdAnEmailSent).append(mpInputEmail->text().toUTF8()));
+				mInfoDialog.Show(kIdSuccess, std::string(kIdYourNewPinIs).append(pin.c_str()).append(kIdAnEmailSent).append(mpInputEmail->text().toUTF8()));
 			} else {
-				AddyInfoDialog info(kIdFailed, kIdMaxLimit);
+				mInfoDialog.Show(kIdFailed, kIdMaxLimit);
 			}
 		} else {
-			AddyInfoDialog info(kIdError, kIdInvalidEmail);
+			mInfoDialog.Show(kIdError, kIdInvalidEmail);
 		}
 	} else {
-		AddyInfoDialog info(kIdError, kIdEmptyField);
+		mInfoDialog.Show(kIdError, kIdEmptyField);
 	}
 }
 
@@ -286,11 +298,11 @@ void AddyPinApp::Manage() {
 			htmlBody = htmlBody.append(kIdEndOfMailHtml);
 			SendEmail(kIdYourMngmntLink, "AddyPin", mpInputEmail2->text().toUTF8(), plainBody, htmlBody);
 
-			AddyInfoDialog info(kIdSuccess, kIdEmailSentMsg);
+			mInfoDialog.Show(kIdSuccess, kIdEmailSentMsg);
 		} else if (ret == AddyDB::kNotFound) {
-			AddyInfoDialog info(kIdError, kIdEmailNotExist);
+			mInfoDialog.Show(kIdError, kIdEmailNotExist);
 		}
 	} else {
-		AddyInfoDialog info(kIdError, kIdEmptyEmail);
+		mInfoDialog.Show(kIdError, kIdEmptyEmail);
 	}
 }

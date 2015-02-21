@@ -7,9 +7,9 @@
 
 #include "inc/AddyUserInfo.h"
 #include "utils/inc/strtk.hpp"
+#include "utils/inc/CException.hpp"
 #include <Wt/WApplication>
-
-const std::string AddyUserInfo::kSeparator = "||";
+#include "tinyxml/tinyxml.h"
 
 AddyUserInfo::AddyUserInfo(std::string addr, std::string pin): mAddress(addr) {
 	mPin.SetPin(pin);
@@ -26,26 +26,33 @@ const std::string& AddyUserInfo::GetPin() {
 	return mPin.GetPin();
 }
 
-/*!
- * decode a 1 string entry from DB file to different fields of the entry
- */
-void AddyUserInfo::Deserialize(const std::string& rEntry) {
-	std::deque<std::string> strList;
-	strtk::parse(rEntry, kSeparator, strList);
-	if (strList.size() == 2) {
-		mAddress = strList[0];
-		mPin.SetPin(strList[1]);
-	} else {
-		Wt::log("error")<<"AddyUserInfo::Deserialize erorrrrrrrrrrrr";
+void AddyUserInfo::Deserialize(TiXmlNode* entry) {
+	try {
+		TiXmlElement* pAddr = entry->FirstChildElement("addr");
+		mAddress = pAddr->FirstChild()->Value();
+
+		TiXmlElement* pPin = entry->FirstChildElement("pin");
+		mPin.SetPin(pPin->FirstChild()->Value());
+
+	} catch (CException& e) {
+		printf("%s\n", e.what());
 	}
 }
 
 /*!
  * encode the user info in 1 string to store to database file and include the given AddyPin in the entry
  */
-void AddyUserInfo::Serialize(std::string& rEntry) {
-	std::string& ret = rEntry;
-	ret = ret.append(mAddress);
-	ret = ret.append(kSeparator);
-	ret = ret.append(mPin.GetPin());
+void AddyUserInfo::Serialize(TiXmlNode* pEntry) {
+	try {
+			TiXmlElement* pAddr = new TiXmlElement("addr");
+			pAddr->LinkEndChild(new TiXmlText(mAddress));
+			pEntry->LinkEndChild(pAddr);
+
+			TiXmlElement* pPin = new TiXmlElement("pin");
+			pPin->LinkEndChild(new TiXmlText(mPin.GetPin()));
+			pEntry->LinkEndChild(pPin);
+
+		} catch (CException& e) {
+		printf("%s\n", e.what());
+	}
 }

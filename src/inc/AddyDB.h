@@ -15,9 +15,10 @@
 #include <map>
 #include <list>
 #include <string>
-#include "../utils/inc/CHdfManager.hpp"
-#include "../utils/inc/CHdfFileAdapter.hpp"
+#include <Wt/WLogger>
 
+
+using namespace Wt;
 using namespace std;
 
 //! the addypin database
@@ -31,7 +32,7 @@ public:
 		kExceededLimit		//!< addition failed because many address entries for the same email
 	} EOperationResult;
 
-	AddyDB();
+	AddyDB(WLogger& rLogger);
 	virtual ~AddyDB();
 
 	EOperationResult Add(string address, string email, string& rAssignedPin);
@@ -44,9 +45,9 @@ private:
 	void DumpPinMap();
 	bool SaveMap();
 	bool LoadMap();
+
 	string AllocateUniquePin(bool master);
-	CHdfFileAdapter mHdfFileAdapter;						//!< file on disk
-	CHdfManager mHdfManager;								//!< HDF formated file manager
+	WLogger&	mrLog;
 	AddyPinAllocator mAddyPinAllocator;						//!< the only allocator for entries in the DB
 	map<string, AddyUserInfo*> mPinAddressMap;				//!< map of pins to user info
 	map<string, string> mEmailToMPinMap;					//!< map of email to master pin

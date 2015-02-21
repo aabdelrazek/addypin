@@ -13,7 +13,7 @@
 #include <Wt/WPushButton>
 #include <Wt/WText>
 #include <Wt/WPanel>
-
+#include "AddyInfoDialog.h"
 #include "AddyDB.h"
 
 using namespace Wt;
@@ -21,7 +21,7 @@ using namespace Wt;
 class AddyAccountMngmnt: public WObject {
 public:
 	AddyAccountMngmnt(Wt::WContainerWidget* pContainer, AddyDB& rDB, std::string masterPin);
-
+	~AddyAccountMngmnt();
 private:
 	std::string mMasterPin;
 	AddyDB& mrDB;
@@ -32,6 +32,7 @@ private:
 	Wt::WContainerWidget* mpContainer;	//!< top container
 	Wt::WCheckBox** mppCheckDelete;		//!< check-boxes for entry deletion
 	Wt::WTextArea** mppAddresses;		//!< table entries for addresses
+	AddyInfoDialog mInfoDialog;
     void ManageAddress();
 };
 

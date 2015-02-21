@@ -37,7 +37,7 @@ DEFS :=
 INCS :=-I inc
 
 #****************************************************************************
-# Include paths
+# output build paths
 #****************************************************************************
 BUILD_DIR := ../../build
 
@@ -86,10 +86,11 @@ clean:
 	-rm -f core ${OBJS_ABS} ${OUTPUT}
 
 depend:
-	makedepend -Y -p${BUILD_DIR}/ --${CXXFLAGS} --${SRCS} ${INCS}
+	makedepend -Y -p${BUILD_DIR}/ --${CXXFLAGS} ${SRCS} ${INCS}
 
 # DO NOT DELETE
 
+../../build/CException.o: inc/CException.hpp inc/types.h
 ../../build/CHdfFileAdapter.o: inc/CHdfFileAdapter.hpp inc/IHdfStorage.hpp
 ../../build/CHdfFileAdapter.o: inc/CPosixFile.hpp inc/IFile.hpp inc/types.h
 ../../build/CHdfFileAdapter.o: inc/CException.hpp inc/NDebugUtils.hpp

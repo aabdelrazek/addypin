@@ -17,6 +17,7 @@ public:
 
 	const std::string& GetPin();
 	void SetPin(std::string& val);
+	void SetPin(const char* val);
 	unsigned int PinLength() { return mPin.length();}
 private:
 	std::string mPin;

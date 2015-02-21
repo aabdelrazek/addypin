@@ -16,6 +16,7 @@
  * user email
  * list of userinfos (currently pairs of addypins and addresses)
  */
+class TiXmlElement;
 
 class AddyMasterInfo {
 public:
@@ -26,15 +27,16 @@ public:
 	const std::string& GetEmail();
 	const unsigned int GetNumEntries();
 	AddyUserInfo* GetEntry(unsigned int id);
-	void Deserialize(const std::string& rEntry);
-	void Serialize(std::string& rEntry);
+
+	void Deserialize(TiXmlElement* pNode);
+	void Serialize(TiXmlElement* pNode);
+
 	bool AddNewEntry(AddyUserInfo* pEntry);
 	void DeleteAllEntries();
 private:
 	std::string mMasterPin;
 	std::string mEmail;
 	std::vector<AddyUserInfo*> mUserInfoEntries;
-	static const std::string kSeparator;
 	unsigned int mMaxEntries;
 };
 

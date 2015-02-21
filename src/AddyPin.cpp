@@ -20,3 +20,7 @@ const std::string& AddyPin::GetPin() {
 void AddyPin::SetPin(std::string& val) {
 	mPin = val;
 }
+
+void AddyPin::SetPin(const char* val) {
+	mPin = std::string(val);
+}
