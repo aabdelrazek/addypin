@@ -42,7 +42,6 @@ public:
 	AddyDB::EOperationResult GetMasterPin(std::string email, std::string& ret);
 
 private:
-	void DumpPinMap();
 	bool SaveMap();
 	bool LoadMap();
 

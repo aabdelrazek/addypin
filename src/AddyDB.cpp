@@ -169,14 +169,6 @@ bool AddyDB::LoadMap() {
 	return ret;
 }
 
-void AddyDB::DumpPinMap() {
-	mrLog.entry("debug")<<"=======================";
-	for (map<string, AddyMasterInfo*>::iterator it = mMPinToInfoListMap.begin(); it != mMPinToInfoListMap.end(); it++) {
-		mrLog.entry("debug")<<"pin map entry with key @ "<< &(it->first) <<"= " << it->first.c_str() << "and data @ " << &(it->second);
-	}
-	mrLog.entry("debug")<<"=======================";
-}
-
 AddyDB::EOperationResult AddyDB::FindByPin(string pin, AddyUserInfo*& pRet) {
 	EOperationResult ret = kNotFound;
 	std::string pinLC = LowerCase(pin);
@@ -199,12 +191,17 @@ AddyDB::EOperationResult AddyDB::FindByPin(string pin, AddyUserInfo*& pRet) {
 AddyDB::EOperationResult AddyDB::GetMasterRecord(string masterPin, string email, list< pair<string, string> >& retPairs) {
 	AddyDB::EOperationResult ret = kSuccess;
 	std::string emailLC = LowerCase(email);
-	if (mEmailToMPinMap.count(emailLC) != 0 && mEmailToMPinMap[emailLC] == masterPin) {
-		AddyMasterInfo* pInfo = mMPinToInfoListMap[masterPin];
-		retPairs.clear();
-		for (unsigned int i = 0; i < pInfo->GetNumEntries(); i++) {
-			AddyUserInfo* pEntry = pInfo->GetEntry(i);
-			retPairs.push_back(pair<string, string>(UpperCase(pEntry->GetPin()), pEntry->GetAddress()));
+
+	if (mEmailToMPinMap.count(emailLC) != 0) {
+		if (mEmailToMPinMap[emailLC] == masterPin) {
+			AddyMasterInfo* pInfo = mMPinToInfoListMap[masterPin];
+			retPairs.clear();
+			for (unsigned int i = 0; i < pInfo->GetNumEntries(); i++) {
+				AddyUserInfo* pEntry = pInfo->GetEntry(i);
+				retPairs.push_back(pair<string, string>(UpperCase(pEntry->GetPin()), pEntry->GetAddress()));
+			}
+		} else {
+			ret = kInvalidPin;
 		}
 	} else {
 		ret = kNotFound;
