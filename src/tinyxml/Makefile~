@@ -1,0 +1,96 @@
+# DEBUG can be set to YES to include debugging info, or NO otherwise
+DEBUG          := YES
+
+#****************************************************************************
+CC     := $(CROSS_COMPILE)gcc
+CXX    := $(CROSS_COMPILE)g++
+LD     := $(CROSS_COMPILE)ld
+AR     := $(CROSS_COMPILE)ar
+RANLIB := $(CROSS_COMPILE)ranlib
+
+DEBUG_CFLAGS     := -Wall -Wno-format -g -DDEBUG -DTIXML_USE_STL
+RELEASE_CFLAGS   := -Wall -Wno-unknown-pragmas -Wno-format -O3
+
+LIBS		 := -lstdc++
+
+DEBUG_CXXFLAGS   := ${DEBUG_CFLAGS} 
+RELEASE_CXXFLAGS := ${RELEASE_CFLAGS}
+
+DEBUG_LDFLAGS    := -g
+RELEASE_LDFLAGS  :=
+
+ifeq (YES, ${DEBUG})
+   CFLAGS       := ${DEBUG_CFLAGS}
+   CXXFLAGS     := ${DEBUG_CXXFLAGS}
+   LDFLAGS      := ${DEBUG_LDFLAGS}
+else
+   CFLAGS       := ${RELEASE_CFLAGS}
+   CXXFLAGS     := ${RELEASE_CXXFLAGS}
+   LDFLAGS      := ${RELEASE_LDFLAGS}
+endif
+
+#****************************************************************************
+# Preprocessor directives
+#****************************************************************************
+DEFS :=
+
+#****************************************************************************
+# Include paths
+#****************************************************************************
+INCS :=
+
+#****************************************************************************
+# output build paths
+#****************************************************************************
+BUILD_DIR := ../../build
+
+
+#****************************************************************************
+# Makefile code common to all platforms
+#****************************************************************************
+
+CFLAGS   := ${CFLAGS}   ${DEFS}
+CXXFLAGS := ${CXXFLAGS} ${DEFS}
+
+#****************************************************************************
+# Targets of the build
+#****************************************************************************
+OUTPUT := ${BUILD_DIR}/libxmlparser.a 
+
+
+all: ${OUTPUT}
+
+
+#****************************************************************************
+# Source files
+#****************************************************************************
+SRCS := tinyxml.cpp tinyxmlparser.cpp xml_parser.cpp tinyxmlerror.cpp tinystr.cpp
+
+OBJS := $(addsuffix .o,$(basename ${SRCS}))
+OBJS_ABS := $(addprefix ${BUILD_DIR}/,$(OBJS))
+
+#****************************************************************************
+# Output
+#****************************************************************************
+
+${OUTPUT}: ${OBJS_ABS}
+	ar -cvq $@ ${OBJS_ABS}
+
+# Rules for compiling source files to object files
+${BUILD_DIR}/%.o : %.cpp
+	${CXX} -c ${CXXFLAGS} ${INCS} $< -o $@
+
+${BUILD_DIR}/%.o : %.c
+	${CC} -c ${CXXFLAGS} ${INCS} $< -o $@
+
+dist:
+	bash makedistlinux
+
+clean:
+	-rm -f core ${OBJS} ${OUTPUT}
+
+depend:
+	makedepend -Y -p${BUILD_DIR}/ --${CXXFLAGS} --${SRCS} ${INCS}
+
+# DO NOT DELETE
+
